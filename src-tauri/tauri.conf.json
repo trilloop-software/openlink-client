@@ -1,13 +1,14 @@
 {
+  "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "package": {
     "productName": "openlink-client",
     "version": "0.1.0"
   },
   "build": {
-    "distDir": "Set automatically by Vue CLI plugin",
-    "devPath": "Set automatically by Vue CLI plugin",
-    "beforeDevCommand": "",
-    "beforeBuildCommand": ""
+    "beforeBuildCommand": "yarn build",
+    "beforeDevCommand": "yarn dev",
+    "devPath": "http://localhost:5173",
+    "distDir": "../dist"
   },
   "tauri": {
     "bundle": {
@@ -28,13 +29,11 @@
       "shortDescription": "",
       "longDescription": "",
       "deb": {
-        "depends": [],
-        "useBootstrapper": false
+        "depends": []
       },
       "macOS": {
         "frameworks": [],
         "minimumSystemVersion": "",
-        "useBootstrapper": false,
         "exceptionDomain": "",
         "signingIdentity": null,
         "entitlements": null
@@ -61,7 +60,7 @@
       }
     ],
     "security": {
-      "csp": "default-src blob: data: filesystem: ws: wss: http: https: tauri: 'unsafe-eval' 'unsafe-inline' 'self' img-src: 'self'"
+      "csp": null
     }
   }
 }
