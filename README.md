@@ -1,4 +1,4 @@
-# my-tauri-app
+# OpenLink Client
 
 ## Project setup
 ```
@@ -7,18 +7,10 @@ yarn install
 
 ### Compiles and hot-reloads for development
 ```
-yarn tauri:serve
+yarn tauri dev
 ```
 
 ### Compiles and minifies for production
 ```
-yarn tauri:build
+yarn tauri build
 ```
-
-### Lints and fixes files
-```
-yarn lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
