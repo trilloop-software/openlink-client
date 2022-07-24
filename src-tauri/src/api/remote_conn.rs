@@ -3,8 +3,8 @@ use quinn::{ClientConfig, Endpoint};
 use std::sync::Arc;
 use tauri::{command, State};
 
-use shared::{remote_conn_packet::*};
-use super::super::Connection;
+use crate::Connection;
+use shared::remote_conn_packet::{decode, encode, RemotePacket};
 
 #[command]
 pub async fn check_conn(conn_state: State<'_, Connection>) -> Result<bool, bool> {
@@ -12,7 +12,7 @@ pub async fn check_conn(conn_state: State<'_, Connection>) -> Result<bool, bool>
 
     match conn {
         Some(_) => Ok(true),
-        None => Err(false)
+        None => Err(false),
     }
 }
 
@@ -27,25 +27,26 @@ pub async fn connect(addr: String, conn_state: State<'_, Connection>) -> Result<
     let endpoint = Endpoint::client("0.0.0.0:0".parse().unwrap());
     let mut endpoint = match endpoint {
         Ok(endpoint) => endpoint,
-        Err(_) => return Err(s!["Failed to bind local network interface"])
+        Err(_) => return Err(s!["Failed to bind local network interface"]),
     };
 
     endpoint.set_default_client_config(client_cfg);
 
-    let new_conn = endpoint
-        .connect(server_addr, "localhost");
+    let new_conn = endpoint.connect(server_addr, "localhost");
 
     let new_conn = match new_conn {
         Ok(new_conn) => new_conn,
-        Err(_) => return Err(s!["Failed to start connection to Pod Computer"])
+        Err(_) => return Err(s!["Failed to start connection to Pod Computer"]),
     };
 
     let new_conn = match new_conn.await {
         Ok(new_conn) => new_conn,
-        Err(_) => return Err(s!["Failed to open connection to Pod Computer"])
+        Err(_) => return Err(s!["Failed to open connection to Pod Computer"]),
     };
 
-    let quinn::NewConnection { connection: conn, .. } = new_conn;
+    let quinn::NewConnection {
+        connection: conn, ..
+    } = new_conn;
 
     *conn_state.0.lock().await = Some(conn);
 
@@ -65,27 +66,26 @@ pub async fn disconnect(conn_state: State<'_, Connection>) -> Result<String, Str
 pub async fn send(conn: &quinn::Connection, pkt: RemotePacket) -> Result<RemotePacket, String> {
     let (mut send, recv) = match conn.open_bi().await {
         Ok((send, recv)) => (send, recv),
-        Err(_) => return Err(s!["Failed to open send and receive streams"])
+        Err(_) => return Err(s!["Failed to open send and receive streams"]),
     };
 
     let req = encode(pkt);
-    
+
     match send.write_all(&req).await {
         Ok(()) => (),
-        Err(_) => return Err(s!["Failed to send request"])
+        Err(_) => return Err(s!["Failed to send request"]),
     };
-    
+
     match send.finish().await {
         Ok(()) => (),
-        Err(_) => return Err(s!["Failed to shutdown stream"])
+        Err(_) => return Err(s!["Failed to shutdown stream"]),
     };
 
     let resp = match recv.read_to_end(usize::max_value()).await {
-        
         Ok(resp) => resp,
-        Err(_) => return Err(s!["Failed to read response"])
+        Err(_) => return Err(s!["Failed to read response"]),
     };
-    
+
     Ok(decode(resp))
 }
 

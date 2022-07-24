@@ -6,7 +6,7 @@
           flat
           dense
           round
-          @click="leftDrawerOpen = !leftDrawerOpen"
+          @click="states.connectState ? leftDrawerOpen = !leftDrawerOpen : {}"
           aria-label="Menu"
           icon="menu"
         />
@@ -116,6 +116,8 @@ export default {
     states.getConnectionState()
     states.getLoginState()
 
+    const leftDrawerOpen = ref(false)
+
     const notifyShow = ref(false)
     const notifyKind = ref('positive')
     const notifyMsg = ref('')
@@ -127,6 +129,7 @@ export default {
             states.connectState = false
             states.loginState = false
             states.usergroupState = 0
+            leftDrawerOpen.value = false
             notifyShow.value = true
             notifyKind.value = 'positive'
             notifyMsg.value = response as string
@@ -159,9 +162,8 @@ export default {
 
     return {
       disconnectPod,
-      leftDrawerOpen: ref(false),
+      leftDrawerOpen,
       logoutUser,
-      miniState: ref(true),
       notifyShow,
       notifyKind,
       notifyMsg,
