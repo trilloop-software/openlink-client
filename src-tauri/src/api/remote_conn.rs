@@ -44,11 +44,7 @@ pub async fn connect(addr: String, conn_state: State<'_, Connection>) -> Result<
         Err(_) => return Err(s!["Failed to open connection to Pod Computer"]),
     };
 
-    let quinn::NewConnection {
-        connection: conn, ..
-    } = new_conn;
-
-    *conn_state.0.lock().await = Some(conn);
+    *conn_state.0.lock().await = Some(new_conn);
 
     Ok(s!["Connected"])
 }
